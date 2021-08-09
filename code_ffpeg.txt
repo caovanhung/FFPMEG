@@ -1,0 +1,27 @@
+Tách âm thanh file video :
+	string CmdText = "ffmpeg -i video.mp4 -vn -ar 44100 -ac 2 -ab 192k -f mp3 sound.mp3"; 
+Chuyển đổi định dạng file video :
+	string CmdText = "ffmpeg -i video_input.xxx video_output.yyy"; 
+Ghép file video với file âm thanh :
+	string CmdText = "ffmpeg -i sound.mp3 -i video_input.mp4 video_output.mp4"; 
+Tăng giảm tốc độ phát video :
+	string CmdText = "ffmpeg -i video.mp4 -vf "setpts=0.5*PTS" highspeed.mp4"; // chú ý : tăng tốc độ video lên 2 lần
+	string CmdText = "ffmpeg -i video.mp4 -vf "setpts=2*PTS" highspeed.mp4"; // giảm tốc độ video xuống 2 lần
+Chèn ảnh vào file âm thanh tạo thành video :
+	string CmdText = "ffmpeg -loop 1 -i image.png -i sound.mp3 -c:v libx264 -c:a aac -strict experimental -b:a 192k -shortest output.mp4"; 
+Cắt và lấy 1 đoạn của video :
+	string CmdText = "ffmpeg -i video.mp4 -ss 00:00:50.0 -codec copy -t 20 output.mp4"; 
+Ghép nhiều video nhỏ thành 1 video : (cùng định dạng file, bit rate...)
+	string CmdText = "ffmpeg -f concat -i file-list.txt -c copy output.mp4"; 
+		Chú ý : nôi dung file file-list.txt sẽ có dạng như sau:
+			file 'small-1.mp4'
+			file 'small-2.mp4'
+
+ffmpeg -i input.mp4 -vn -ar 44100 -ac 2 -ab 192k -f mp3 voice.mp3 
+ffmpeg -i voice.mp3 -filter_complex "[0:a]showwaves=s=1280x720:mode=line:rate=25, format=yuv420p[v]" -map "[v]" -map 0:a output.mp4
+
+ffmpeg -i input.mp4 -vf boxblur=2 -c:v libx264 -c:a copy -f flv blur.mp4
+
+ffmpeg -i input.mp4 -filter_complex "[0:v]boxblur=10[bg];[0:v]crop=200:200:60:30[fg];[bg][fg]overlay=60:30" -map "[v]" -map 0:a -c:v libx264 -c:a copy -movflags +faststart derpdogblur1.mp4
+
+ffmpeg -i input.mp4 -filter_complex "[0:v]crop=200:100:60:30,boxblur=10:enable='between(t,60*2,60*2+10)'[fg]; [0:v][fg]overlay=60:30[v]" -map "[v]" -map 0:a -c:v libx264 -c:a copy -movflags +faststart derpdogblur.mp4
